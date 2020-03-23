@@ -4,7 +4,7 @@ from docopt import docopt
 
 from . import InvalidResponse, jason
 
-def process(rover_file, process_type="GNSS", base_file=None, base_position=None, **kwargs):
+def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, **kwargs):
     """
     Submit a process to Jason and wait for it to end so that the results file
     is also download
@@ -13,7 +13,7 @@ def process(rover_file, process_type="GNSS", base_file=None, base_position=None,
     sys.stderr.write('Process file {}\n'.format(rover_file))
 
     process_id = submit(rover_file, process_type=process_type, 
-                        base_file=base_file, base_position=base_position)
+                        base_file=base_file, base_lonlathgt=base_lonlathgt)
 
     if process_id is None:
         sys.stderr.write('Could not submit [ {} ] for processing\n'.format(rover_file))
@@ -49,7 +49,7 @@ def status(process_id, **kwargs):
     else:
         return None
 
-def submit(rover_file, process_type="GNSS", base_file=None, base_position=None, **kwargs):
+def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, **kwargs):
     """
     Submit a process to the server without waiting for it to end
     """
@@ -57,7 +57,8 @@ def submit(rover_file, process_type="GNSS", base_file=None, base_position=None, 
     process_id = None
 
     ret, return_code = jason.submit_process(rover_file, 
-                        process_type=process_type, base_position=base_position)
+                        process_type=process_type, 
+                        base_file=base_file, base_lonlathgt=base_lonlathgt)
     
     if return_code == 200:
         process_id = ret['id']

@@ -45,7 +45,7 @@ jason.download_results(process_id)
 ## Command line tools
 
 The package has also a command line tool so that you can use it out-of-the-box.
-The following examples illustrate how to use it
+The following examples illustrate how to use it.
 
 ```bash
 export JASON_API_KEY='<jason-api-key>'
@@ -58,7 +58,13 @@ jason -h
 jason process test/jason_gnss_test_file_rover.txt
 
 # Process a rover file and adding a base station file as well
-jason process test/jason_gnss_test_file_rover.txt test/jason_gnss_test_file_base.txt 
+jason process test/jason_gnss_test_file_rover.txt test/jason_gnss_test_file_base.txt
+
+# Perform a PPK processing specifying a rover, base file as well as the location
+# of the base station
+jason process test/jason_gnss_test_file_rover.txt \
+              test/jason_gnss_test_file_base.txt \
+              --base_position 41.809142804  2.163228514  936.01730
 
 # Get the status of a process
 jason status process_id
@@ -66,6 +72,8 @@ jason status process_id
 # Fetch the results file for a given process id
 jason download process_id
 ```
+
+The arguments of the command line tools follow the [docopt](http://docopt.org)
 
 ## Docker execution/development
 

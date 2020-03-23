@@ -1,6 +1,9 @@
 import requests
 import os
+import os.path
+import sys
 import urllib
+import tempfile
 
 from . import AuthenticationError, API_URL, API_KEY_ENV_NAME, SECRET_TOKEN_ENV_NAME
 
@@ -33,25 +36,50 @@ def status(platform, app_version, api_key=None, secret_token=None):
     return r.json(), r.status_code
 
 
-def submit_process(rover_file, process_type="GNSS", base_file=None, base_position=None,
+def submit_process(rover_file, process_type="GNSS", 
+                    base_file=None, base_lonlathgt=None,
                     api_key=None, secret_token=None):
     """
+    Submit a process to Jason PaaS
     """
+
+    if not os.path.isfile(rover_file):
+        sys.stderr.write("Rover file [ {} ] does not exist!".format(rover_file))
+        return None, None
+    elif base_file and not os.path.isfile(base_file):
+        sys.stderr.write("Base file [ {} ] specified but does not exist!".format(base_file))
+        return None, None
+
+    rover_file_fh = open(rover_file, 'rb')
+    base_file_fh = open(base_file, 'rb') if base_file else None
 
     api_key, secret_token = __fetch_credentials__(api_key, secret_token)
 
     url='{}/processes'.format(API_URL)
     
     headers = __build_headers__(api_key)
-    
-    with open(rover_file, 'rb') as fh:
-        files = {
-            'type' : (None, process_type),
-            'token' : (None, secret_token),
-            'rover_file': (rover_file, fh)
-        }
-    
-        r = requests.post(url, headers=headers, files=files)
+
+    files = {
+        'type' : (None, process_type),
+        'token' : (None, secret_token),
+        'rover_file': (rover_file, rover_file_fh)
+    }
+
+    if base_file:
+        files.update({'base_file' : (base_file, base_file_fh)})
+
+    config_file, config_file_fh = __create_config_file__(base_lonlathgt)
+    if config_file:
+        files.update({'config_file' : ('config_file', config_file_fh)})
+
+    r = requests.post(url, headers=headers, files=files)
+
+    rover_file_fh.close()
+    if base_file_fh:
+        base_file_fh.close()
+    if config_file_fh:
+        config_file_fh.close()
+        os.remove(config_file)
 
     return r.json(), r.status_code
 
@@ -121,3 +149,25 @@ def __fetch_credentials__(api_key, secret_token):
         secret_token = os.getenv(SECRET_TOKEN_ENV_NAME, secret_token)
 
     return api_key, secret_token
+
+def __create_config_file__(base_lonlathgt=None):
+
+    fh, name = tempfile.mkstemp(prefix='config_file_', text=True)
+    fh = open(name, 'w')
+
+    dynamics = 'dynamic'
+    fh.write('rover_dynamics:\n    {}\n'.format(dynamics))
+
+    if base_lonlathgt:
+        lat = base_lonlathgt[1]
+        lon = base_lonlathgt[0]
+        hgt = base_lonlathgt[2]
+        latlonstr = '{},{},{}'.format(lat, lon, hgt)
+
+        fh.write('external_base_station_position:\n    {}\n'.format(latlonstr))
+
+    fh.close()
+
+    fh = open(name, 'r')
+
+    return name, fh

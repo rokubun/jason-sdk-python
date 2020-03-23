@@ -12,8 +12,8 @@ Alternatively, you can override these settings via the command line arguments
 Usage:
     jason -h | --help
     jason --version
-    jason process   <rover_file> [ <base_file> ]
-    jason submit    <rover_file> [ <base_file>  [ --base_position <x> <y> <z> ] ]
+    jason process   <rover_file> [ <base_file> ] [ --base_position <lat> <lon> <height> ]
+    jason submit    <rover_file> [ <base_file> ] [ --base_position <lat> <lon> <height> ]
     jason download  <process_id>
     jason status    <process_id>
 
@@ -22,7 +22,7 @@ Options:
     -v --version     shows the version
     --api-key        Override the API key from the environment variables
     --secret-token   Override the User secret token from the envirnement variables
-    --base_position  Optional base station position (in ECEF XYZ, meters)
+    --base_position  Optional base station position (in WGS84 format)
 
 Commands:
     process        Submit a file to process and wait for the results (returns the process id)
@@ -43,9 +43,9 @@ def main():
 
     version = pkg_resources.require("jason-gnss")[0].version
 
-    args = docopt.docopt(__doc__, version=version, options_first=True)
+    args = docopt.docopt(__doc__, version=version, options_first=False)
 
-    #sys.stderr.write("Start main, parsed arg {}\n".format(args))
+    #sys.stderr.write("Start main, parsed arg\n {}\n".format(args))
 
     command, command_args = __get_command__(args)
 
@@ -88,12 +88,12 @@ def __get_submit_args__(args):
     }
 
     if '--base_position' in args:
-        ecef_xyz = [
-            args.get('<x>', None),
-            args.get('<y>', None),
-            args.get('<z>', None)
+        lonlathgt = [
+            args.get('<lon>', None),
+            args.get('<lat>', None),
+            args.get('<height>', None)
         ]
-        command_args.update({'--base_position' : ecef_xyz})
+        command_args.update({'base_lonlathgt' : lonlathgt})
 
     return command_args
 
