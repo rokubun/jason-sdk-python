@@ -26,6 +26,9 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
 
         if status(process_id) == 'FINISHED':
             return download(process_id)
+        elif status(process_id) == 'ERROR':
+            sys.stderr.write('An unexpected error occurred in the task!\n')
+            return None
 
         time.sleep(3)
         elapsed_time = time.time() - start_time

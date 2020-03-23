@@ -71,6 +71,9 @@ jason status process_id
 
 # Fetch the results file for a given process id
 jason download process_id
+
+# Convert a file to RINEX 3.03 format
+jason convert test/jason_gnss_test_file_smartphone.txt
 ```
 
 The arguments of the command line tools follow the [docopt](http://docopt.org)

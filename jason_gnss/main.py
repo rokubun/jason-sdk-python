@@ -16,6 +16,7 @@ Usage:
     jason submit    <rover_file> [ <base_file> ] [ --base_position <lat> <lon> <height> ]
     jason download  <process_id>
     jason status    <process_id>
+    jason convert   <gnss_file>
 
 Options:
     -h --help        shows the help
@@ -29,6 +30,10 @@ Commands:
     submit         Send a file to process, without waiting for the results
     status         Get the status of a process (useful to know if results are ready)
     download       Get the results for a given process ID
+    convert        Convert an input file into a RINEX 3.03 format and, if 
+                   present in the file, camera/trigger events. If the input
+                   file comes from an Argonaut/MEDEA GNSS receiver, also provide
+                   with the IMU measurements
 """
 import docopt
 import pkg_resources
@@ -76,6 +81,13 @@ def __get_command__(args):
     elif args['status']:
         command = commands.status
         command_args = { 'process_id': args.get('<process_id>', None)}
+
+    elif args['convert']:
+        command = commands.process
+        command_args = {
+            'rover_file' : args.get('<gnss_file>', None),
+            'process_type' : "CONVERSION"
+        }
 
     return command, command_args
 
