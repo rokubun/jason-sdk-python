@@ -18,9 +18,6 @@ def status(platform, app_version, api_key=None, secret_token=None):
 
     api_key, secret_token = __fetch_credentials__(api_key, secret_token)
 
-    import sys
-    sys.stderr.write(api_key + '\n')
-
     headers = __build_headers__(api_key)
 
     params = { 
