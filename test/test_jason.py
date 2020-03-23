@@ -35,11 +35,11 @@ def test_process():
     assert process_id != None
 
 
-def test_get_status():
+def test_get_status_ko_unauthorized_process():
 
     process_id = 707
 
     ret, return_code = jason.get_status(process_id)
-    assert return_code == 200
+    assert return_code == 403
     assert 'process' in ret
     assert 'status' in ret['process']
