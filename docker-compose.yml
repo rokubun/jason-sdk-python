@@ -1,0 +1,14 @@
+version: "3.4"
+
+services: 
+
+  jason_gnss:
+      build:
+          context: ./
+          target: development
+      entrypoint: /bin/sh
+      working_dir: /jason_gnss
+      volumes:
+        - .:/jason_gnss
+      env_file: .env
+      

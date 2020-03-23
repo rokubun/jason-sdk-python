@@ -1,0 +1,13 @@
+
+*__pycache__
+.eggs
+*.egg-info
+build
+dist
+
+# Docker related files
+.env
+
+# Visual Studio Code files
+jason_gnss.code-workspace
+.vscode
