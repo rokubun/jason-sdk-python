@@ -17,6 +17,7 @@ Usage:
     jason download  <process_id>
     jason status    <process_id>
     jason convert   <gnss_file>
+    jason list_processes
 
 Options:
     -h --help        shows the help
@@ -34,6 +35,7 @@ Commands:
                    present in the file, camera/trigger events. If the input
                    file comes from an Argonaut/MEDEA GNSS receiver, also provide
                    with the IMU measurements
+    list_processes Get the list of processes issued by the user
 """
 import docopt
 import pkg_resources
@@ -88,6 +90,9 @@ def __get_command__(args):
             'rover_file' : args.get('<gnss_file>', None),
             'process_type' : "CONVERSION"
         }
+    
+    elif args['list_processes']:
+        command = commands.list_processes
 
     return command, command_args
 

@@ -97,12 +97,13 @@ def get_status(process_id, api_key=None, secret_token=None):
     return r.json(), r.status_code
 
 
-def download_results(process_id):
+def download_results(process_id, api_key=None, secret_token=None):
     """
     Get the file bundle (compressed file) with the processing results
     """
 
-    status, status_code = get_status(process_id)
+    status, status_code = get_status(process_id,
+                                     api_key=api_key, secret_token=secret_token)
 
     if (status_code != 200):
         return None
@@ -121,7 +122,35 @@ def download_results(process_id):
     
     return results_file_name
 
+def list_processes(api_key=None, secret_token=None):
+    """
+    List the processess that the user has issued
+    """
 
+    api_key, secret_token = __fetch_credentials__(api_key, secret_token)
+
+    url='{}/users/{}/processes'.format(API_URL, secret_token)
+
+    headers = __build_headers__(api_key)
+    params = {}
+
+    r = requests.get(url, headers=headers, params=params)
+
+    processes = []
+    if r.status_code == 200:
+        processes = [__filter_process_info__(p) for p in r.json()]    
+
+    return processes
+
+def __filter_process_info__(process_info):
+
+    FIELDS = ['id', 'type', 'status', 'source_file', 'created']
+
+    out = { k:process_info[k] for k in FIELDS}
+
+    out['source_file'] = process_info['source_file'].split('/')[-1]
+
+    return out
 
 
 def __build_headers__(api_key):

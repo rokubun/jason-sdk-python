@@ -79,3 +79,25 @@ def download(process_id, **kwargs):
     sys.stderr.write('Results file [ {} ] for process id [ {} ] downloaded\n'.format(filename, process_id))
 
     return filename
+
+def list_processes(**kwargs):
+    """
+    List the processes issues by the user
+    """
+
+    processes = jason.list_processes()
+
+    header_printed = False
+    for process in processes:
+
+        if not header_printed:
+            fields = process.keys()
+
+            header_printed = True
+
+            sys.stdout.write('# {}\n'.format(','.join(fields)))
+
+        process_str = ','.join([str(process[k]) for k in process])
+        sys.stdout.write(process_str + '\n')            
+
+    return None

@@ -39,5 +39,5 @@ def test_get_status_ko_unauthorized_process():
 
     process_id = 707
 
-    ret, return_code = jason.get_status(process_id)
+    _, return_code = jason.get_status(process_id)
     assert return_code == 403
