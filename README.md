@@ -14,6 +14,8 @@ To install the package:
 pip3 install jason-gnss
 ```
 
+Note that this SDK supports only Python 3.x.
+
 ## Authentication
 
 It is important that you have the `JASON_API_KEY` and `JASON_SECRET_TOKEN` 
