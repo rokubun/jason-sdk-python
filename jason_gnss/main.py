@@ -41,7 +41,7 @@ import docopt
 import pkg_resources
 import sys
 
-from . import commands
+from . import commands, AuthenticationError
 
 
 def main():
@@ -56,8 +56,10 @@ def main():
 
     command, command_args = __get_command__(args)
 
-    command(**command_args)
-
+    try:
+        command(**command_args)
+    except AuthenticationError as e:
+        sys.stderr.write("FATAL: " + str(e))
 
     return 0
 

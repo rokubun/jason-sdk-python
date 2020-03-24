@@ -10,7 +10,7 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
     is also download
     """
 
-    sys.stderr.write('Process file {}\n'.format(rover_file))
+    #sys.stderr.write('Process file {}\n'.format(rover_file))
 
     process_id = submit(rover_file, process_type=process_type, 
                         base_file=base_file, base_lonlathgt=base_lonlathgt)

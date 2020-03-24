@@ -174,6 +174,9 @@ def __fetch_credentials__(api_key, secret_token):
     if secret_token is None:
         secret_token = os.getenv(SECRET_TOKEN_ENV_NAME, secret_token)
 
+    if api_key is None or secret_token is None:
+        raise AuthenticationError("Missing Api key and/or secret token\n")
+
     return api_key, secret_token
 
 def __create_config_file__(base_lonlathgt=None):
