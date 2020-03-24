@@ -58,7 +58,7 @@ def main():
 
     try:
         command(**command_args)
-    except AuthenticationError as e:
+    except (AuthenticationError,ValueError) as e:
         sys.stderr.write("FATAL: " + str(e))
 
     return 0

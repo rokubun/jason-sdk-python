@@ -41,3 +41,13 @@ def test_get_status_ko_unauthorized_process():
 
     _, return_code = jason.get_status(process_id)
     assert return_code == 403
+
+def test_get_status_ko_wrong_process_id():
+
+    process_id = '3545lldsfdf'
+
+    try:
+        jason.get_status(process_id)
+    except ValueError:
+        pass
+ 

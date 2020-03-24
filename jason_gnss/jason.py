@@ -85,6 +85,8 @@ def get_status(process_id, api_key=None, secret_token=None):
     Check the status of a specific process_id
     """
 
+    __check_process_id__(process_id)
+    
     api_key, secret_token = __fetch_credentials__(api_key, secret_token)
 
     url='{}/processes/{}'.format(API_URL, process_id)
@@ -200,3 +202,14 @@ def __create_config_file__(base_lonlathgt=None):
     fh = open(name, 'r')
 
     return name, fh
+
+def __check_process_id__(process_id):
+
+    import re
+
+    process_id_str = str(process_id)
+    pattern = re.compile('[0-9]')
+    result = pattern.findall(process_id_str)
+
+    if len(result) != len(process_id_str):
+        raise ValueError('Process ID [ {} ] does not seem correct, only numbers are allowed\n'.format(process_id_str))
