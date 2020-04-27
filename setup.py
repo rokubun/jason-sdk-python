@@ -17,7 +17,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='http://opensource.org/licenses/MIT',
-    url="https://github.com/rokubun/jason-gnss",
+    url="https://github.com/rokubun/jason-sdk-python",
     setup_requires=['setuptools-git-version-cc'],
     packages=["jason_gnss"],
     include_package_data=True,
