@@ -12,19 +12,21 @@ Alternatively, you can override these settings via the command line arguments
 Usage:
     jason -h | --help
     jason --version
-    jason process   <rover_file> [ <base_file> ] [ --base_position <lat> <lon> <height> ]
-    jason submit    <rover_file> [ <base_file> ] [ --base_position <lat> <lon> <height> ]
-    jason download  <process_id>
-    jason status    <process_id>
-    jason convert   <gnss_file>
+    jason process   <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-d level]
+    jason submit    <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-d level]
+    jason download  <process_id> [-d level]
+    jason status    <process_id> [-d level]
+    jason convert   <gnss_file> [-d level]
     jason list_processes
 
 Options:
     -h --help        shows the help
     -v --version     shows the version
+    -d --debug (DEBUG | INFO | WARNING | CRITICAL)
+                     Output debug information or more verbose output [default: CRITICAL]
     --api-key        Override the API key from the environment variables
     --secret-token   Override the User secret token from the envirnement variables
-    --base_position  Optional base station position (in WGS84 format)
+    -p --base_position  Optional base station position (in WGS84 format)
 
 Commands:
     process        Submit a file to process and wait for the results (returns the process id)
@@ -41,6 +43,8 @@ import docopt
 import pkg_resources
 import sys
 
+from roktools import logger
+
 from . import commands, AuthenticationError
 
 
@@ -52,14 +56,16 @@ def main():
 
     args = docopt.docopt(__doc__, version=version, options_first=False)
 
-    #sys.stderr.write("Start main, parsed arg\n {}\n".format(args))
+    logger.set_level(args['--debug'])
+
+    logger.debug("Start main, parsed arg\n {}".format(args))
 
     command, command_args = __get_command__(args)
 
     try:
         command(**command_args)
     except (AuthenticationError,ValueError) as e:
-        sys.stderr.write("FATAL: " + str(e))
+        logger.critical(str(e))
 
     return 0
 

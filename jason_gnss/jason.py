@@ -1,9 +1,10 @@
 import requests
 import os
 import os.path
-import sys
 import urllib
 import tempfile
+
+from roktools import logger
 
 from . import AuthenticationError, API_URL, API_KEY_ENV_NAME, SECRET_TOKEN_ENV_NAME
 
@@ -41,10 +42,10 @@ def submit_process(rover_file, process_type="GNSS",
     """
 
     if not os.path.isfile(rover_file):
-        sys.stderr.write("Rover file [ {} ] does not exist!".format(rover_file))
+        logger.critical("Rover file [ {} ] does not exist!".format(rover_file))
         return None, None
     elif base_file and not os.path.isfile(base_file):
-        sys.stderr.write("Base file [ {} ] specified but does not exist!".format(base_file))
+        logger.critical("Base file [ {} ] specified but does not exist!".format(base_file))
         return None, None
 
     rover_file_fh = open(rover_file, 'rb')

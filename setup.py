@@ -25,7 +25,8 @@ setup(
     install_requires=[
         "docopt",
         "requests",
-        "pytest"
+        "pytest",
+        "roktools"
     ],
     entry_points={
         'console_scripts': [

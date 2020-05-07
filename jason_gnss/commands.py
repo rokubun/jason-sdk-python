@@ -2,6 +2,8 @@ import sys
 import time
 from docopt import docopt
 
+from roktools import logger
+
 from . import InvalidResponse, jason
 
 def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, **kwargs):
@@ -10,13 +12,13 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
     is also download
     """
 
-    #sys.stderr.write('Process file {}\n'.format(rover_file))
+    logger.info('Process file [ {} ]'.format(rover_file))
 
     process_id = submit(rover_file, process_type=process_type, 
                         base_file=base_file, base_lonlathgt=base_lonlathgt)
 
     if process_id is None:
-        sys.stderr.write('Could not submit [ {} ] for processing\n'.format(rover_file))
+        logger.critical('Could not submit [ {} ] for processing'.format(rover_file))
         return None
 
     ELAPSED_TIME_THRESHOLD = 60
@@ -27,7 +29,7 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
         if status(process_id) == 'FINISHED':
             return download(process_id)
         elif status(process_id) == 'ERROR':
-            sys.stderr.write('An unexpected error occurred in the task!\n')
+            logger.critical('An unexpected error occurred in the task!')
             return None
 
         time.sleep(3)
@@ -35,7 +37,7 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
         if (elapsed_time > ELAPSED_TIME_THRESHOLD):
             break
 
-    sys.stderr.write('Time Out!')
+    logger.critical('Time Out!')
     return None
 
 def status(process_id, **kwargs):
@@ -76,7 +78,7 @@ def download(process_id, **kwargs):
 
     filename = jason.download_results(process_id)
 
-    sys.stderr.write('Results file [ {} ] for process id [ {} ] downloaded\n'.format(filename, process_id))
+    logger.info('Results file [ {} ] for process id [ {} ] downloaded\n'.format(filename, process_id))
 
     return filename
 
