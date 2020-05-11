@@ -114,11 +114,13 @@ def download_results(process_id, api_key=None, secret_token=None):
     if status['process']['status'] != 'FINISHED':
         return None
 
-    ZIP_FILE_POS = -1
-    url = status['results'][ZIP_FILE_POS]['url']
-    results_file_name = os.path.join(os.getcwd(), status['results'][ZIP_FILE_POS]['name'])
+    zip_result = list(filter(lambda x: (x['type'] == 'zip'), status['results']))[0]
 
+    url = zip_result["value"]
     r = requests.get(url)
+
+    basename = zip_result["name"]
+    results_file_name = os.path.join(os.getcwd(), basename)
     f = open(results_file_name, 'wb')
     f.write(r.content)
     f.close()
