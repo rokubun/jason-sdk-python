@@ -91,7 +91,7 @@ def submit_process(rover_file, process_type="GNSS",
     if strategy:
         files.update({'user_strategy' : (None, strategy)})
 
-    logger.debug(f'Query parameters {files}')
+    logger.debug('Query parameters {}'.format(files))
 
     r = requests.post(url, headers=headers, files=files)
 
