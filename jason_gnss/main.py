@@ -12,8 +12,12 @@ Alternatively, you can override these settings via the command line arguments
 Usage:
     jason -h | --help
     jason --version
-    jason process   <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-l <label>] [--dynamics <dynamic_type>] [-d <level>]
-    jason submit    <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-l <label>] [--dynamics <dynamic_type>] [-d <level>]
+    jason process   <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] 
+                                 [-l <label>] [--dynamics <dynamic_type>] 
+                                 [-s <strategy>] [-d <level>]
+    jason submit    <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] 
+                                 [-l <label>] [--dynamics <dynamic_type>] 
+                                 [-s <strategy>] [-d <level>]
     jason download  <process_id> [-d <level>]
     jason status    <process_id> [-d <level>]
     jason convert   <gnss_file> [-d <level>]
@@ -29,6 +33,13 @@ Options:
     -l --label <label>  Specify a human readable label to easily identify your process [default: jason-gnss]
     --dynamics (static | dynamic) 
                         Specify the dynamics of the rover receiver [default: dynamic]
+    -s --strategy (auto | PPP | PPK | SPP)
+                        Select the processing strategy to be applied or let
+                        Jason decide the strategy based on the input data. 
+                        Strategies can be Precise Point Positioning (PPP, does not
+                        require base station), Post-Processing Kinematic (PPK,
+                        which requires a base station) or Single Point Positioning
+                        (SPP) [default: auto]
     -p --base_position <lat> <lon> <height>  
                         Optional base station position (in WGS84 format)
 
@@ -129,6 +140,9 @@ def __get_submit_args__(args):
 
     if '--dynamics' in args:
         command_args.update({'rover_dynamics' : args['--dynamics']})
+
+    if '--strategy' in args and args['--strategy'] != "auto":
+        command_args.update({'strategy' : args['--strategy']})
 
     return command_args
 
