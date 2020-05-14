@@ -36,9 +36,25 @@ def status(platform, app_version, api_key=None, secret_token=None):
 
 def submit_process(rover_file, process_type="GNSS", 
                     base_file=None, base_lonlathgt=None,
-                    api_key=None, secret_token=None):
+                    api_key=None, secret_token=None, rover_dynamics='dynamic',
+                    strategy=None, label="jason-gnss"):
     """
     Submit a process to Jason PaaS
+
+    :param rover_file: Filename with the GNSS measurements of the rover receiver
+    :param process_type: Type of process to submit to Jason (GNSS or CONVERSION)
+    :param base_file: Filename with the GNSS measurements of the base receiver
+    :param base_lonlathgt: Array with the longitude, latitude and height
+    :param api_key: Jason API key, if not provided will be fetched from the 
+                    environement variables
+    :param secret_token: Your Jason user secret token, if not provided will be 
+                    fetched from the environement variables
+    :param strategy: Force processing strategy (e.g. PPP or PPK). If left to None
+                    Jason will work on a best effort basis, trying to pick
+                    the most accurate strategy given the data provided by the
+                    user.
+    :param rover_dynamics: Dynamics of the rover receiver ('static' or 'dynamic')
+    :param label: specify a label for the process to submit
     """
 
     if not os.path.isfile(rover_file):
@@ -60,7 +76,9 @@ def submit_process(rover_file, process_type="GNSS",
     files = {
         'type' : (None, process_type),
         'token' : (None, secret_token),
-        'rover_file': (rover_file, rover_file_fh)
+        'rover_file': (rover_file, rover_file_fh),
+        'rover_dynamics': (None, rover_dynamics),
+        'label': (None, label)
     }
 
     if base_file:
@@ -69,6 +87,11 @@ def submit_process(rover_file, process_type="GNSS",
     config_file, config_file_fh = __create_config_file__(base_lonlathgt)
     if config_file:
         files.update({'config_file' : ('config_file', config_file_fh)})
+
+    if strategy:
+        files.update({'user_strategy' : (None, strategy)})
+
+    logger.debug(f'Query parameters {files}')
 
     r = requests.post(url, headers=headers, files=files)
 

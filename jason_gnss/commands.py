@@ -15,7 +15,7 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
     logger.info('Process file [ {} ]'.format(rover_file))
 
     process_id = submit(rover_file, process_type=process_type, 
-                        base_file=base_file, base_lonlathgt=base_lonlathgt)
+                        base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
 
     if process_id is None:
         logger.critical('Could not submit [ {} ] for processing'.format(rover_file))
@@ -63,7 +63,7 @@ def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None,
 
     ret, return_code = jason.submit_process(rover_file, 
                         process_type=process_type, 
-                        base_file=base_file, base_lonlathgt=base_lonlathgt)
+                        base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
     
     if return_code == 200:
         process_id = ret['id']

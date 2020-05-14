@@ -26,6 +26,7 @@ setup(
         "docopt",
         "requests",
         "pytest",
+        "pytest-mocha",
         "roktools"
     ],
     entry_points={

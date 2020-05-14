@@ -12,21 +12,25 @@ Alternatively, you can override these settings via the command line arguments
 Usage:
     jason -h | --help
     jason --version
-    jason process   <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-d level]
-    jason submit    <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-d level]
-    jason download  <process_id> [-d level]
-    jason status    <process_id> [-d level]
-    jason convert   <gnss_file> [-d level]
+    jason process   <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-l <label>] [--dynamics <dynamic_type>] [-d <level>]
+    jason submit    <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] [-l <label>] [--dynamics <dynamic_type>] [-d <level>]
+    jason download  <process_id> [-d <level>]
+    jason status    <process_id> [-d <level>]
+    jason convert   <gnss_file> [-d <level>]
     jason list_processes
 
 Options:
-    -h --help        shows the help
-    -v --version     shows the version
+    -h --help           shows the help
+    -v --version        shows the version
     -d --debug (DEBUG | INFO | WARNING | CRITICAL)
-                     Output debug information or more verbose output [default: CRITICAL]
-    --api-key        Override the API key from the environment variables
-    --secret-token   Override the User secret token from the envirnement variables
-    -p --base_position  Optional base station position (in WGS84 format)
+                        Output debug information or more verbose output [default: CRITICAL]
+    --api-key           Override the API key from the environment variables
+    --secret-token      Override the User secret token from the environment variables
+    -l --label <label>  Specify a human readable label to easily identify your process [default: jason-gnss]
+    --dynamics (static | dynamic) 
+                        Specify the dynamics of the rover receiver [default: dynamic]
+    -p --base_position <lat> <lon> <height>  
+                        Optional base station position (in WGS84 format)
 
 Commands:
     process        Submit a file to process and wait for the results (returns the process id)
@@ -119,6 +123,12 @@ def __get_submit_args__(args):
             args.get('<height>', None)
         ]
         command_args.update({'base_lonlathgt' : lonlathgt})
+    
+    if '--label' in args:
+        command_args.update({'label' : args['--label']})
+
+    if '--dynamics' in args:
+        command_args.update({'rover_dynamics' : args['--dynamics']})
 
     return command_args
 
