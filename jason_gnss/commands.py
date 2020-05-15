@@ -16,9 +16,8 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
     logger.info('Process file [ {} ]'.format(rover_file))
     logger.debug('Timeout  {}'.format(timeout))
 
-    res = submit(rover_file, process_type=process_type, 
+    process_id = submit(rover_file, process_type=process_type, 
                  base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
-    process_id = res['process_id']
 
     if process_id is None:
         logger.critical('Could not submit [ {} ] for processing'.format(rover_file))
@@ -30,7 +29,8 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
     spinner = __spinning_cursor__()
     while True:
 
-        process_status = status(process_id)['status']
+        process_status = status(process_id)
+        logger.debug('Processing status {}'.format(process_status))
 
         if process_status == 'FINISHED':
             logger.info('Completed process with ID {}'.format(process_id))
@@ -65,8 +65,9 @@ def status(process_id, **kwargs):
     
     ret, return_code = jason.get_status(process_id)
 
+    logger.debug('Return code {}'.format(ret))
     if return_code == 200:
-        res = {'status' : ret['process']['status']}
+        res = ret['process']['status']
     
     return res
 
@@ -84,7 +85,7 @@ def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None,
                         base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
     
     if return_code == 200:
-        res = { 'process_id' : ret['id'] }
+        res =  ret['id']
 
     return res
 
@@ -96,11 +97,10 @@ def download(process_id, **kwargs):
     """
 
     filename = jason.download_results(process_id)
-    res = { 'filename' : filename }
 
     logger.info('Results file [ {} ] for process id [ {} ] downloaded\n'.format(filename, process_id))
 
-    return res
+    return filename
 
 # ------------------------------------------------------------------------------
 
@@ -110,6 +110,8 @@ def list_processes(**kwargs):
     """
 
     processes = jason.list_processes()
+
+    res = None
 
     header_printed = False
     for process in processes:
@@ -121,10 +123,11 @@ def list_processes(**kwargs):
 
             sys.stdout.write('# {}\n'.format(','.join(fields)))
 
-        process_str = ','.join([str(process[k]) for k in process])
-        sys.stdout.write(process_str + '\n')            
+        if res is None:
+            res = ""
+        res += ','.join([str(process[k]) for k in process])
 
-    return None
+    return res
 
 
 def __spinning_cursor__(flavour='basic'):

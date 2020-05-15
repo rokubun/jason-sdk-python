@@ -57,7 +57,6 @@ Commands:
     list_processes Get the list of processes issued by the user
 """
 import docopt
-import json
 import pkg_resources
 import sys
 
@@ -83,7 +82,7 @@ def main():
     try:
         res = command(**command_args)
         if res:
-            json.dump(res, sys.stdout)
+            sys.stdout.write('{}\n'.format(res))
     except (AuthenticationError,ValueError) as e:
         logger.critical(str(e))
 

@@ -1,4 +1,3 @@
-import json
 import subprocess
 import time
 
@@ -124,9 +123,7 @@ def test_command_process():
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, _ = p.communicate()
     assert p.returncode == 0
-
-    out = json.loads(stdout)
-    assert 'filename' in out
+    assert len(stdout)
 
 # ------------------------------------------------------------------------------
 
@@ -135,30 +132,23 @@ def test_command_submit_status_and_download():
 
     cmd = ["jason", "submit", 'test/jason_gnss_test_file_smartphone.txt']
 
-    process_id = None
-
-
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, _ = p.communicate()
+    process_id, _ = p.communicate()
     assert p.returncode == 0
-    out = json.loads(stdout)
-    assert 'process_id' in out
-    process_id = out['process_id']
-
     assert process_id
+
+    process_id = int(process_id)
 
     cmd = ["jason", "status", str(process_id)]
 
     while True:
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, _ = p.communicate()
+        status, _ = p.communicate()
         assert p.returncode == 0
-        out = json.loads(stdout)
-        assert 'status' in out
-        status = out['status']
+        assert status
 
-        if status == 'FINISHED':
+        if 'FINISHED' in status.decode('utf-8'):
             break
 
         time.sleep(1)
@@ -168,8 +158,7 @@ def test_command_submit_status_and_download():
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, _ = p.communicate()
     assert p.returncode == 0
-    out = json.loads(stdout)
-    assert 'filename' in out
+    assert len(stdout)
 
 # ------------------------------------------------------------------------------
 
@@ -181,9 +170,7 @@ def test_command_convert():
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, _ = p.communicate()
     assert p.returncode == 0
-    out = json.loads(stdout)
-    assert 'filename' in out
-
+    assert len(stdout)
 
 # ------------------------------------------------------------------------------
 
