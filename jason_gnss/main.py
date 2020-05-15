@@ -14,7 +14,7 @@ Usage:
     jason --version
     jason process   <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] 
                                  [-l <label>] [--dynamics <dynamic_type>] 
-                                 [-s <strategy>] [-d <level>]
+                                 [-s <strategy>] [-t <seconds>] [-d <level>]
     jason submit    <rover_file> [ <base_file> ] [ -p <lat> <lon> <height> ] 
                                  [-l <label>] [--dynamics <dynamic_type>] 
                                  [-s <strategy>] [-d <level>]
@@ -42,6 +42,8 @@ Options:
                         (SPP) [default: auto]
     -p --base_position <lat> <lon> <height>  
                         Optional base station position (in WGS84 format)
+    -t --timeout <seconds>  Maximum time to wait until the process is finished.
+                        If not specified, it will wait until process is done.
 
 Commands:
     process        Submit a file to process and wait for the results (returns the process id)
@@ -55,6 +57,7 @@ Commands:
     list_processes Get the list of processes issued by the user
 """
 import docopt
+import json
 import pkg_resources
 import sys
 
@@ -78,7 +81,9 @@ def main():
     command, command_args = __get_command__(args)
 
     try:
-        command(**command_args)
+        res = command(**command_args)
+        if res:
+            json.dump(res, sys.stdout)
     except (AuthenticationError,ValueError) as e:
         logger.critical(str(e))
 
@@ -94,6 +99,9 @@ def __get_command__(args):
     if args['process']:
         command = commands.process
         command_args = __get_submit_args__(args)
+
+        if '--timeout' in args and args['--timeout']:
+            command_args.update({'timeout' : float(args['--timeout'])})
     
     elif args['submit']:
         command = commands.submit

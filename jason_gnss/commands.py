@@ -1,75 +1,94 @@
 import sys
 import time
+import json
 from docopt import docopt
 
 from roktools import logger
 
 from . import InvalidResponse, jason
 
-def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, **kwargs):
+def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, timeout=None, **kwargs):
     """
     Submit a process to Jason and wait for it to end so that the results file
     is also download
     """
 
     logger.info('Process file [ {} ]'.format(rover_file))
+    logger.debug('Timeout  {}'.format(timeout))
 
-    process_id = submit(rover_file, process_type=process_type, 
-                        base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
+    res = submit(rover_file, process_type=process_type, 
+                 base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
+    process_id = res['process_id']
 
     if process_id is None:
         logger.critical('Could not submit [ {} ] for processing'.format(rover_file))
         return None
-
-    ELAPSED_TIME_THRESHOLD = 60
+    
+    logger.info('Submitted process with ID {}'.format(process_id))
 
     start_time = time.time()
+    spinner = __spinning_cursor__()
     while True:
 
-        if status(process_id) == 'FINISHED':
+        process_status = status(process_id)['status']
+
+        if process_status == 'FINISHED':
+            logger.info('Completed process with ID {}'.format(process_id))
             return download(process_id)
-        elif status(process_id) == 'ERROR':
+        elif process_status == 'ERROR':
             logger.critical('An unexpected error occurred in the task!')
             return None
 
-        time.sleep(3)
-        elapsed_time = time.time() - start_time
-        if (elapsed_time > ELAPSED_TIME_THRESHOLD):
-            break
+        # Spinner
+        sys.stderr.write(next(spinner))
+        sys.stderr.flush()
+        time.sleep(1)
+        sys.stderr.write('\b')
 
-    logger.critical('Time Out!')
+        if (timeout and time.time() - start_time > timeout):
+            logger.critical("Time Out! The process did not end in " +
+                            "[ {} ] seconds, ".format(timeout) +
+                            "but might be available for download at a later stage.")
+            return None
+
+    logger.critical('Unexpected error occured')
     return None
+
+# ------------------------------------------------------------------------------
 
 def status(process_id, **kwargs):
     """
     Get the status of the given process_id
     """
+
+    res = None
     
     ret, return_code = jason.get_status(process_id)
 
     if return_code == 200:
-        status = ret['process']['status']
-        sys.stdout.write('{}\n'.format(status))
-        return status
-    else:
-        return None
+        res = {'status' : ret['process']['status']}
+    
+    return res
+
+# ------------------------------------------------------------------------------
 
 def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, **kwargs):
     """
     Submit a process to the server without waiting for it to end
     """
 
-    process_id = None
+    res = None
 
     ret, return_code = jason.submit_process(rover_file, 
                         process_type=process_type, 
                         base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
     
     if return_code == 200:
-        process_id = ret['id']
+        res = { 'process_id' : ret['id'] }
 
-    return process_id
+    return res
 
+# ------------------------------------------------------------------------------
 
 def download(process_id, **kwargs):
     """
@@ -77,14 +96,17 @@ def download(process_id, **kwargs):
     """
 
     filename = jason.download_results(process_id)
+    res = { 'filename' : filename }
 
     logger.info('Results file [ {} ] for process id [ {} ] downloaded\n'.format(filename, process_id))
 
-    return filename
+    return res
+
+# ------------------------------------------------------------------------------
 
 def list_processes(**kwargs):
     """
-    List the processes issues by the user
+    List the processes issued by the user
     """
 
     processes = jason.list_processes()
@@ -103,3 +125,18 @@ def list_processes(**kwargs):
         sys.stdout.write(process_str + '\n')            
 
     return None
+
+
+def __spinning_cursor__(flavour='basic'):
+
+    FLAVOUR = {
+        'basic': '-\|/-\|/',
+        'braille': "⡀⡁⡂⡃⡄⡅⡆⡇⡈⡉⡊⡋⡌⡍⡎⡏⡐⡑⡒⡓⡔⡕⡖⡗⡘⡙⡚⡛⡜⡝⡞⡟⡠⡡⡢⡣⡤⡥⡦⡧⡨⡩⡪⡫⡬⡭⡮⡯⡰⡱⡲⡳⡴⡵⡶⡷⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⢈⢉⢊⢋⢌⢍⢎⢏⢐⢑⢒⢓⢔⢕⢖⢗⢘⢙⢚⢛⢜⢝⢞⢟⢠⢡⢢⢣⢤⢥⢦⢧⢨⢩⢪⢫⢬⢭⢮⢯⢰⢱⢲⢳⢴⢵⢶⢷⢸⢹⢺⢻⢼⢽⢾⢿⣀⣁⣂⣃⣄⣅⣆⣇⣈⣉⣊⣋⣌⣍⣎⣏⣐⣑⣒⣓⣔⣕⣖⣗⣘⣙⣚⣛⣜⣝⣞⣟⣠⣡⣢⣣⣤⣥⣦⣧⣨⣩⣪⣫⣬⣭⣮⣯⣰⣱⣲⣳⣴⣵⣶⣷⣸⣹⣺⣻⣼⣽⣾⣿"
+    }
+    
+    cursors = FLAVOUR.get(flavour, 'basic')
+
+    while True:
+        for cursor in cursors:
+                yield cursor
+
