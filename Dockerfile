@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.10 as development
+FROM rokubun/python:numpy-slim-buster as development
 
 LABEL authors="Miquel Garcia"
 LABEL email="info@rokubun.cat"
@@ -10,7 +10,8 @@ WORKDIR /jason-gnss
 
 COPY . .
 
-RUN apk add git \
+RUN apt-get update \
+ && apt-get install -y git \
  && pip install -e .
 
 CMD sh
