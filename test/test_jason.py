@@ -100,6 +100,22 @@ def test_process_static_geodetic_rx():
 
 # ------------------------------------------------------------------------------
 
+def test_process_geodetic_rx_force_basepos():
+    '''GNSS :: process rover only / geodetic rx / force base position :: Should return a process id'''
+
+    rover_file = 'test/jason_gnss_test_file_base.txt'
+    base_lonlathgt = [-122.447607089227205,37.890876744023892,-21.096]
+    ret, return_code = jason.submit_process(rover_file, base_lonlathgt=base_lonlathgt, label="jason-gnss_test_process_geodetic_rx_force_basepos")
+    assert return_code == 200
+    assert 'message' in ret
+    assert 'id' in ret
+
+    process_id = ret['id']
+
+    assert process_id != None
+
+# ------------------------------------------------------------------------------
+
 def test_process_force_strategy_geodetic_rx():
     '''GNSS :: process rover only / geodetic rx / force PPP :: Should return a process id'''
 

@@ -88,6 +88,13 @@ def submit_process(rover_file, process_type="GNSS",
     if config_file:
         files.update({'config_file' : ('config_file', config_file_fh)})
 
+    if base_lonlathgt:
+        lon = base_lonlathgt[0]
+        lat = base_lonlathgt[1]
+        hgt = base_lonlathgt[2]
+        pos_str = '{},{},{}'.format(lat, lon, hgt)
+        files.update({'external_base_station_position' : (None, pos_str)})
+
     if strategy:
         files.update({'user_strategy' : (None, strategy)})
 
