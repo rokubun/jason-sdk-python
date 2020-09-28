@@ -157,17 +157,25 @@ def test_command_submit_status_and_download():
 
     cmd = ["jason", "status", str(process_id)]
 
-    while True:
+    tic = time.clock()
+    TIMEOUT_THRESHOLD_S = 5 * 60
+    finished = False
+    while not finished:
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         status, _ = p.communicate()
         assert p.returncode == 0
         assert status
 
-        if 'FINISHED' in status.decode('utf-8'):
+        finished = 'FINISHED' in status.decode('utf-8')
+
+        toc = time.clock()
+        if toc - tic >= TIMEOUT_THRESHOLD_S:
             break
 
         time.sleep(1)
+
+    assert finished
 
     cmd = ["jason", "download", str(process_id)]
 
