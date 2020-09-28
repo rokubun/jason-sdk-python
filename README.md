@@ -118,3 +118,8 @@ to declare these variables.
 JASON_API_KEY='<jason-api-key>'
 JASON_SECRET_TOKEN='<your-private-jason-user-token>'
 ```
+
+Although probably not used for the end user, for debugging purposes, in the
+event that you have a local instance of the Jason service running in your
+facilities, you can set the Jason entry point by defining the `JASON_API_URL`
+environment variable.

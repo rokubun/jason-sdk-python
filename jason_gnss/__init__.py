@@ -1,9 +1,6 @@
+import os
 
-API_URL='http://api-argonaut.rokubun.cat/api'
-API_KEY_ENV_NAME='JASON_API_KEY'
-SECRET_TOKEN_ENV_NAME='JASON_SECRET_TOKEN'
-
-
+API_URL=os.getenv('JASON_API_URL', 'http://api-argonaut.rokubun.cat/api')
 
 class AuthenticationError(Exception):
     def __init__(self, message):

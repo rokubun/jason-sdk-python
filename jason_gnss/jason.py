@@ -6,7 +6,7 @@ import tempfile
 
 from roktools import logger
 
-from . import AuthenticationError, API_URL, API_KEY_ENV_NAME, SECRET_TOKEN_ENV_NAME
+from . import AuthenticationError, API_URL
 
 def status(platform, app_version, api_key=None, secret_token=None):
     """
@@ -204,10 +204,10 @@ def __build_headers__(api_key):
 def __fetch_credentials__(api_key, secret_token):
 
     if api_key is None:
-        api_key = os.getenv(API_KEY_ENV_NAME, api_key)
+        api_key = os.getenv('JASON_API_KEY', api_key)
 
     if secret_token is None:
-        secret_token = os.getenv(SECRET_TOKEN_ENV_NAME, secret_token)
+        secret_token = os.getenv('JASON_SECRET_TOKEN', secret_token)
 
     if api_key is None or secret_token is None:
         raise AuthenticationError("Missing Api key and/or secret token\n")
