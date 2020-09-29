@@ -157,7 +157,7 @@ def test_command_submit_status_and_download():
 
     cmd = ["jason", "status", str(process_id)]
 
-    tic = time.clock()
+    tic = time.process_time()
     TIMEOUT_THRESHOLD_S = 5 * 60
     finished = False
     while not finished:
@@ -169,7 +169,7 @@ def test_command_submit_status_and_download():
 
         finished = 'FINISHED' in status.decode('utf-8')
 
-        toc = time.clock()
+        toc = time.process_time()
         if toc - tic >= TIMEOUT_THRESHOLD_S:
             break
 
