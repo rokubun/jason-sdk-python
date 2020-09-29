@@ -138,7 +138,7 @@ def __get_submit_args__(args):
         try:
             lonlathgt = [ args['<lon>'], args['<lat>'], args['<height>'] ]
         except KeyError:
-            logger.critical(f'Invalid base station position')
+            logger.critical('Invalid base station position')
             sys.exit(2)
 
         command_args.update({'base_lonlathgt' : lonlathgt})
