@@ -134,12 +134,13 @@ def __get_submit_args__(args):
         'base_file' : args.get('<base_file>', None),
     }
 
-    if '--base_position' in args:
-        lonlathgt = [
-            args.get('<lon>', None),
-            args.get('<lat>', None),
-            args.get('<height>', None)
-        ]
+    if args.get('--base_position', None):
+        try:
+            lonlathgt = [ args['<lon>'], args['<lat>'], args['<height>'] ]
+        except KeyError:
+            logger.critical(f'Invalid base station position')
+            sys.exit(2)
+
         command_args.update({'base_lonlathgt' : lonlathgt})
     
     if '--label' in args:

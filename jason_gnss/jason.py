@@ -69,6 +69,8 @@ def submit_process(rover_file, process_type="GNSS",
 
     api_key, secret_token = __fetch_credentials__(api_key, secret_token)
 
+    logger.debug(f'Submitting job to end-point {API_URL}')
+
     url='{}/processes'.format(API_URL)
     
     headers = __build_headers__(api_key)
