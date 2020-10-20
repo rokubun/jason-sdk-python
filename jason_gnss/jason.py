@@ -33,6 +33,7 @@ def status(platform, app_version, api_key=None, secret_token=None):
 
     return r.json(), r.status_code
 
+# ------------------------------------------------------------------------------
 
 def submit_process(rover_file, process_type="GNSS", 
                     base_file=None, base_lonlathgt=None,
@@ -113,6 +114,8 @@ def submit_process(rover_file, process_type="GNSS",
 
     return r.json(), r.status_code
 
+# ------------------------------------------------------------------------------
+
 def get_status(process_id, api_key=None, secret_token=None):
     """
     Check the status of a specific process_id
@@ -131,6 +134,7 @@ def get_status(process_id, api_key=None, secret_token=None):
 
     return r.json(), r.status_code
 
+# ------------------------------------------------------------------------------
 
 def download_results(process_id, api_key=None, secret_token=None):
     """
@@ -159,6 +163,8 @@ def download_results(process_id, api_key=None, secret_token=None):
     
     return results_file_name
 
+# ------------------------------------------------------------------------------
+
 def list_processes(api_key=None, secret_token=None):
     """
     List the processess that the user has issued
@@ -179,6 +185,32 @@ def list_processes(api_key=None, secret_token=None):
 
     return processes
 
+# ------------------------------------------------------------------------------
+
+def api_status(api_key=None):
+    """
+    Get the API status, containing the version of the software running the versions
+    """
+
+    api_key, _ = __fetch_credentials__(api_key, None)
+
+    url='{}/status'.format(API_URL)
+
+    headers = __build_headers__(api_key)
+    params = {}
+
+    r = requests.get(url, headers=headers, params=params)
+
+    if r.status_code == 200:
+        out = r.json()
+        out.pop('success')
+    else:
+        out = None
+
+    return out
+
+# ------------------------------------------------------------------------------
+
 def __filter_process_info__(process_info):
 
     FIELDS = ['id', 'type', 'status', 'source_file', 'created']
@@ -188,6 +220,8 @@ def __filter_process_info__(process_info):
     out['source_file'] = process_info['source_file'].split('/')[-1]
 
     return out
+
+# ------------------------------------------------------------------------------
 
 
 def __build_headers__(api_key):
@@ -203,6 +237,8 @@ def __build_headers__(api_key):
 
     return headers
 
+# ------------------------------------------------------------------------------
+
 def __fetch_credentials__(api_key, secret_token):
 
     if api_key is None:
@@ -215,6 +251,8 @@ def __fetch_credentials__(api_key, secret_token):
         raise AuthenticationError("Missing Api key and/or secret token\n")
 
     return api_key, secret_token
+
+# ------------------------------------------------------------------------------
 
 def __create_config_file__(base_lonlathgt=None):
 
@@ -237,6 +275,8 @@ def __create_config_file__(base_lonlathgt=None):
     fh = open(name, 'r')
 
     return name, fh
+
+# ------------------------------------------------------------------------------
 
 def __check_process_id__(process_id):
 

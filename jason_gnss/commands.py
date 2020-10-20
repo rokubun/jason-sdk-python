@@ -129,6 +129,13 @@ def list_processes(**kwargs):
 
     return res
 
+# ------------------------------------------------------------------------------
+
+def api_status():
+
+    return jason.api_status()
+
+# ------------------------------------------------------------------------------
 
 def __spinning_cursor__(flavour='basic'):
 
