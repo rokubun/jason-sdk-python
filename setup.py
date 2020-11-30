@@ -13,7 +13,7 @@ setup(
     version_cc='{version}',
     author='Rokubun',
     author_email='info@rokubun.cat',
-    description='Python bindings for Jason Positioning-as-a-Service: Rokubun GNSS processing engine in the cloud.',
+    description='Python bindings for Jason Cloud PPK Service: Rokubun GNSS processing engine in the cloud.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='http://opensource.org/licenses/MIT',

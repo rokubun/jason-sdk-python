@@ -1,6 +1,6 @@
-# Python SDK for Jason GNSS Positioning-as-a-Service
+# Python SDK for Jason GNSS Cloud PPK Service
 
-[Jason GNSS Positioning-as-a-Service](https://jason.rokubun.cat) is a cloud-based
+[Jason GNSS Cloud PPK Service](https://jason.rokubun.cat) is a cloud-based
 positioning engine that uses GNSS data. One of the main features of this service
 is that offers an API so that users can automatize the GNSS data processing
 without the need to access the front-end.
