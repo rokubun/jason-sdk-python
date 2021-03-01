@@ -4,10 +4,11 @@ import json
 from docopt import docopt
 
 from roktools import logger
+import exif
 
 from . import InvalidResponse, jason
 
-def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, timeout=None, **kwargs):
+def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, images_folder=None, timeout=None, **kwargs):
     """
     Submit a process to Jason and wait for it to end so that the results file
     is also download
@@ -17,7 +18,7 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
     logger.debug('Timeout  {}'.format(timeout))
 
     process_id = submit(rover_file, process_type=process_type, 
-                 base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
+                 base_file=base_file, base_lonlathgt=base_lonlathgt, images_folder=None, **kwargs)
 
     if process_id is None:
         logger.critical('Could not submit [ {} ] for processing'.format(rover_file))
@@ -73,16 +74,16 @@ def status(process_id, **kwargs):
 
 # ------------------------------------------------------------------------------
 
-def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, **kwargs):
+def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, images_folder=None, **kwargs):
     """
     Submit a process to the server without waiting for it to end
     """
 
     res = None
-
+    images_metadata_file = exif.get_exif_tags_file(images_folder=images_folder) if images_folder else None
     ret, return_code = jason.submit_process(rover_file, 
-                        process_type=process_type, 
-                        base_file=base_file, base_lonlathgt=base_lonlathgt, **kwargs)
+                        process_type=process_type, base_file=base_file,
+                        base_lonlathgt=base_lonlathgt, images_metadata_file=images_metadata_file, **kwargs)
     
     if return_code == 200:
         res =  ret['id']

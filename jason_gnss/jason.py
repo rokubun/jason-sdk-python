@@ -36,7 +36,7 @@ def status(platform, app_version, api_key=None, secret_token=None):
 # ------------------------------------------------------------------------------
 
 def submit_process(rover_file, process_type="GNSS", 
-                    base_file=None, base_lonlathgt=None,
+                    base_file=None, base_lonlathgt=None, images_metadata_file=None,
                     api_key=None, secret_token=None, rover_dynamics='dynamic',
                     strategy=None, label="jason-gnss"):
     """
@@ -46,6 +46,7 @@ def submit_process(rover_file, process_type="GNSS",
     :param process_type: Type of process to submit to Jason (GNSS or CONVERSION)
     :param base_file: Filename with the GNSS measurements of the base receiver
     :param base_lonlathgt: Array with the longitude, latitude and height
+    :param images_metadata_file: Filename with the exif data of the images in the folder
     :param api_key: Jason API key, if not provided will be fetched from the 
                     environement variables
     :param secret_token: Your Jason user secret token, if not provided will be 
@@ -67,6 +68,7 @@ def submit_process(rover_file, process_type="GNSS",
 
     rover_file_fh = open(rover_file, 'rb')
     base_file_fh = open(base_file, 'rb') if base_file else None
+    images_metadata_file_fh = open(images_metadata_file, 'rb') if images_metadata_file else None
 
     api_key, secret_token = __fetch_credentials__(api_key, secret_token)
 
@@ -81,7 +83,8 @@ def submit_process(rover_file, process_type="GNSS",
         'token' : (None, secret_token),
         'rover_file': (rover_file, rover_file_fh),
         'rover_dynamics': (None, rover_dynamics),
-        'label': (None, label)
+        'label': (None, label),
+        'images_metadata_file': (images_metadata_file, images_metadata_file_fh)
     }
 
     if base_file:
@@ -90,6 +93,9 @@ def submit_process(rover_file, process_type="GNSS",
     config_file, config_file_fh = __create_config_file__(base_lonlathgt)
     if config_file:
         files.update({'config_file' : ('config_file', config_file_fh)})
+
+    if images_metadata_file:
+        files.update({'camera_metadata_file' : (images_metadata_file, images_metadata_file_fh)})
 
     if base_lonlathgt:
         lon = base_lonlathgt[0]
@@ -111,6 +117,8 @@ def submit_process(rover_file, process_type="GNSS",
     if config_file_fh:
         config_file_fh.close()
         os.remove(config_file)
+    if images_metadata_file_fh:
+        images_metadata_file_fh.close()
 
     return r.json(), r.status_code
 

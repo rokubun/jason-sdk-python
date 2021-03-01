@@ -44,6 +44,10 @@ Options:
                         Optional base station position (in WGS84 format)
     -t --timeout <seconds>  Maximum time to wait until the process is finished.
                         If not specified, it will wait until process is done.
+    -i --images_folder <images_folder>
+                        Specify the path of the folder containing the images for the photogrametic data. 
+                        Obtains the metadata (EXIF) from the images in folder to match them with their
+                        corresponding events.
 
 Commands:
     process        Submit a file to process and wait for the results (returns the process id)
@@ -151,6 +155,9 @@ def __get_submit_args__(args):
 
     if '--strategy' in args and args['--strategy'] != "auto":
         command_args.update({'strategy' : args['--strategy']})
+
+    if '--images_folder' in args:
+        command_args.update({'images_folder' : args['--images_folder']})
 
     return command_args
 
