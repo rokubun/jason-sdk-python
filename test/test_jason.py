@@ -210,3 +210,16 @@ def test_command_list_process():
     assert len(stdout)
 
 # ------------------------------------------------------------------------------
+
+def test_commands_submit_with_exif():
+    '''Commands :: submit :: Should return '''
+    
+    cmd = ['jason', 'submit', 'test/jason_gnss_test_file_base.txt', '--images_folder', 'test/data/exif/']
+
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, _ = p.communicate()
+
+    assert p.returncode == 0
+    assert len(stdout)
+
+# ------------------------------------------------------------------------------

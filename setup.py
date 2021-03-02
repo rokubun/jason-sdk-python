@@ -27,7 +27,8 @@ setup(
         "requests",
         "pytest",
         "pytest-mocha",
-        "roktools"
+        "roktools",
+        "exifread"
     ],
     entry_points={
         'console_scripts': [

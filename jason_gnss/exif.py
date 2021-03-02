@@ -3,16 +3,15 @@ import sys
 import os
 import exifread
 import json
+from roktools import logger
 
 def get_images_in_path (images_path):
     images_names = []
-    for image_name in os.listdir(images_path):
-        if image_name.endswith(".JPG"):
-            images_names.append(image_name)
+    if os.path.exists(images_path):
+        for image_name in os.listdir(images_path):
+            if image_name.endswith(".JPG"):
+                images_names.append(image_name)
 
-    if images_names == []:
-        images_names = -1
-    
     return images_names
 
 def get_image_exif(image_path):
@@ -40,18 +39,22 @@ def create_output_file(exif_tags_array, images_folder, output_filename=None):
 
 def get_exif_tags_file(images_folder, output_filename=None):
     images_names = get_images_in_path(images_folder)
+    exif_tags_filepath = None
 
-    if images_names == -1:
-        exif_tags_filepath = -1
-    
-    else:
+    if len(images_names) > 0:
         exif_tags_array = {}
         for image_name in images_names:
             image_path = os.path.join(images_folder, image_name)
             exif_tags = get_image_exif(image_path)
             exif_tags_array[image_name] = exif_tags
 
-        exif_tags_filepath = create_output_file(exif_tags_array, images_folder, output_filename)
+        if len(exif_tags_array) > 0:
+            exif_tags_filepath = create_output_file(exif_tags_array, images_folder, output_filename)
+        else:
+            logger.info('EXIF data not available for images in the selected path.')
+
+    else:
+        logger.info('Selected path does not exist or no JPG images could be found in it.')
 
     return exif_tags_filepath
 

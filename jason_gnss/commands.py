@@ -1,10 +1,11 @@
 import sys
 import time
 import json
+import jason_gnss.exif as exif
 from docopt import docopt
 
 from roktools import logger
-import exif
+
 
 from . import InvalidResponse, jason
 
@@ -18,7 +19,7 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
     logger.debug('Timeout  {}'.format(timeout))
 
     process_id = submit(rover_file, process_type=process_type, 
-                 base_file=base_file, base_lonlathgt=base_lonlathgt, images_folder=None, **kwargs)
+                 base_file=base_file, base_lonlathgt=base_lonlathgt, images_folder=images_folder, **kwargs)
 
     if process_id is None:
         logger.critical('Could not submit [ {} ] for processing'.format(rover_file))
@@ -80,13 +81,17 @@ def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None,
     """
 
     res = None
-    images_metadata_file = exif.get_exif_tags_file(images_folder=images_folder) if images_folder else None
-    ret, return_code = jason.submit_process(rover_file, 
-                        process_type=process_type, base_file=base_file,
-                        base_lonlathgt=base_lonlathgt, images_metadata_file=images_metadata_file, **kwargs)
-    
-    if return_code == 200:
-        res =  ret['id']
+    camera_metadata_file = exif.get_exif_tags_file(images_folder=images_folder) if images_folder else None
+
+    if camera_metadata_file:
+        ret, return_code = jason.submit_process(rover_file,
+                            process_type=process_type, base_file=base_file,
+                            base_lonlathgt=base_lonlathgt, camera_metadata_file=camera_metadata_file, **kwargs)
+
+        if return_code == 200:
+            res =  ret['id']
+    else:
+        logger.critical('It was not possible to generate the camera metadata file.')
 
     return res
 
