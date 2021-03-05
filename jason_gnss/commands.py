@@ -81,18 +81,20 @@ def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None,
     """
 
     res = None
-    camera_metadata_file = exif.get_exif_tags_file(images_folder=images_folder) if images_folder else None
+    camera_metadata_file = None
 
-    if camera_metadata_file:
-        ret, return_code = jason.submit_process(rover_file,
-                            process_type=process_type, base_file=base_file,
-                            base_lonlathgt=base_lonlathgt, camera_metadata_file=camera_metadata_file, **kwargs)
+    if images_folder:
+        camera_metadata_file = exif.get_exif_tags_file(images_folder=images_folder)
+        if camera_metadata_file is None:
+            logger.critical('It was not possible to generate the camera metadata file.')
 
-        if return_code == 200:
-            res =  ret['id']
-    else:
-        logger.critical('It was not possible to generate the camera metadata file.')
+    ret, return_code = jason.submit_process(rover_file,
+                        process_type=process_type, base_file=base_file,
+                        base_lonlathgt=base_lonlathgt, camera_metadata_file=camera_metadata_file, **kwargs)
 
+    if return_code == 200:
+        res =  ret['id']
+        
     return res
 
 # ------------------------------------------------------------------------------

@@ -211,7 +211,7 @@ def test_command_list_process():
 
 # ------------------------------------------------------------------------------
 
-def test_commands_submit_with_exif():
+def test_command_submit_with_exif():
     '''Commands :: submit :: Should return '''
     
     cmd = ['jason', 'submit', 'test/jason_gnss_test_file_base.txt', '--images_folder', 'test/data/exif/']
