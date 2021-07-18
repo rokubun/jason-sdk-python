@@ -1,13 +1,10 @@
 import sys
 import time
-import json
 import jason_gnss.exif as exif
-from docopt import docopt
 
 from roktools import logger
 
-
-from . import InvalidResponse, jason
+from . import jason
 
 def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None, images_folder=None, timeout=None, **kwargs):
     """
@@ -53,8 +50,6 @@ def process(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None
                             "but might be available for download at a later stage.")
             return None
 
-    logger.critical('Unexpected error occured')
-    return None
 
 # ------------------------------------------------------------------------------
 
@@ -112,7 +107,7 @@ def download(process_id, **kwargs):
 
 # ------------------------------------------------------------------------------
 
-def list_processes(**kwargs):
+def list_processes(**_):
     """
     List the processes issued by the user
     """
@@ -133,7 +128,7 @@ def list_processes(**kwargs):
 
         if res is None:
             res = ""
-        res += ','.join([str(process[k]) for k in process])
+        res += ','.join([str(process[k]) for k in process]) + '\n'
 
     return res
 

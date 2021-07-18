@@ -1,7 +1,6 @@
 import requests
 import os
 import os.path
-import urllib
 import tempfile
 
 from roktools import logger
