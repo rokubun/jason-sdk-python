@@ -94,7 +94,7 @@ def submit(rover_file, process_type="GNSS", base_file=None, base_lonlathgt=None,
 
 # ------------------------------------------------------------------------------
 
-def download(process_id, **kwargs):
+def download(process_id, **_):
     """
     Download the results for the given process_id
     """
@@ -107,12 +107,12 @@ def download(process_id, **kwargs):
 
 # ------------------------------------------------------------------------------
 
-def list_processes(**_):
+def list_processes(user_only=True, **_):
     """
     List the processes issued by the user
     """
 
-    processes = jason.list_processes()
+    processes = jason.list_processes(user_only=user_only)
 
     res = None
 

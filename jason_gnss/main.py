@@ -23,7 +23,7 @@ Usage:
     jason download  <process_id> [-d <level>]
     jason status    <process_id> [-d <level>]
     jason convert   <gnss_file> [-d <level>]
-    jason list_processes
+    jason list_processes [--all]
 
 Options:
     -h --help           shows the help
@@ -50,6 +50,8 @@ Options:
                         Specify the path of the folder containing the images for the photogrametic data. 
                         Obtains the metadata (EXIF) from the images in folder to match them with their
                         corresponding events.
+    --all               List all processes instead of those for the user only
+                        (requires an admin token)
 
 Commands:
     process        Submit a file to process and wait for the results (returns the process id)
@@ -129,6 +131,9 @@ def __get_command__(args):
     
     elif args['list_processes']:
         command = commands.list_processes
+        command_args = {
+            'user_only': not args.get('--all', False),
+        }
 
     return command, command_args
 

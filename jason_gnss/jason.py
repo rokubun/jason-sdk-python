@@ -172,25 +172,53 @@ def download_results(process_id, api_key=None, secret_token=None):
 
 # ------------------------------------------------------------------------------
 
-def list_processes(api_key=None, secret_token=None):
+def list_processes(api_key=None, secret_token=None, user_only=True):
     """
-    List the processess that the user has issued
+    List the processess issued by the user (or all processes if the user has admin
+    privileges)
     """
 
     api_key, secret_token = __fetch_credentials__(api_key, secret_token)
+
+    if user_only:
+        url, headers, params, fields = __get_args_for_own_processes(api_key, secret_token)
+    else:
+        url, headers, params, fields = __get_args_for_all_processes(api_key, secret_token)
+
+    r = requests.get(url, headers=headers, params=params)
+
+    processes = []
+    if r.status_code == 200:
+        processes = [__filter_process_info__(p, fields=fields) for p in r.json()]    
+    elif r.status_code == 403:
+        logger.critical('You need admin privileges to get all processes')
+
+    return processes
+
+def __get_args_for_own_processes(api_key, secret_token):
 
     url='{}/users/{}/processes'.format(API_URL, secret_token)
 
     headers = __build_headers__(api_key)
     params = {}
 
-    r = requests.get(url, headers=headers, params=params)
+    fields = ['id', 'type', 'status', 'source_file', 'created']
 
-    processes = []
-    if r.status_code == 200:
-        processes = [__filter_process_info__(p) for p in r.json()]    
+    return url, headers, params, fields
 
-    return processes
+def __get_args_for_all_processes(api_key, secret_token, status='FINISHED'):
+
+    url='{}/processes'.format(API_URL)
+   
+    headers = __build_headers__(api_key)
+    params = { 
+        'status' : status,
+        'token' : secret_token
+    }
+
+    fields = ['id', 'type', 'email', 'status', 'source_file', 'created', 'dynamic', 'strategy', 'num_epochs']
+ 
+    return url, headers, params, fields
 
 # ------------------------------------------------------------------------------
 
@@ -218,13 +246,12 @@ def api_status(api_key=None):
 
 # ------------------------------------------------------------------------------
 
-def __filter_process_info__(process_info):
+def __filter_process_info__(process_info, fields):
 
-    FIELDS = ['id', 'type', 'status', 'source_file', 'created']
+    out = { k:process_info[k] for k in fields}
 
-    out = { k:process_info[k] for k in FIELDS}
-
-    out['source_file'] = process_info['source_file'].split('/')[-1]
+    source_file = process_info.get('source_file', "")
+    out['source_file'] = source_file.split('/')[-1]
 
     return out
 
