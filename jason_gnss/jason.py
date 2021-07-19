@@ -216,7 +216,7 @@ def __get_args_for_all_processes(api_key, secret_token, status='FINISHED'):
         'token' : secret_token
     }
 
-    fields = ['id', 'type', 'email', 'status', 'source_file', 'created', 'dynamic', 'strategy', 'num_epochs']
+    fields = ['id', 'type', 'email', 'status', 'source_file', 'source_base_file', 'created', 'dynamic', 'strategy', 'num_epochs']
  
     return url, headers, params, fields
 
